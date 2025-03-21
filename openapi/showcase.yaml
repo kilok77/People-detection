@@ -1,0 +1,78 @@
+openapi: 3.0.0
+info:
+  title: Authentication API
+  version: "1.0"
+  description: API for user login and registration.
+paths:
+  /login:
+    post:
+      summary: User Login
+      description: Authenticate a user and return a token.
+      requestBody:
+        description: User login credentials.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: johndoe
+                password:
+                  type: string
+                  example: secret123
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Successful login, returns authentication token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Unauthorized – Invalid credentials provided.
+  /register:
+    post:
+      summary: User Registration
+      description: Create a new user account.
+      requestBody:
+        description: User registration information.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: janedoe
+                password:
+                  type: string
+                  example: mysecretpassword
+                email:
+                  type: string
+                  example: janedoe@example.com
+              required:
+                - username
+                - password
+                - email
+      responses:
+        '201':
+          description: User successfully registered.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered successfully.
+        '400':
+          description: Bad Request – Registration failed due to invalid input.
