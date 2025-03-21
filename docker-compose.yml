@@ -21,13 +21,15 @@ services:
 
   sqlite-web:
     image: coleifer/sqlite-web:latest
+    container_name: sqlite-web
     ports:
       - "8080:8080"
     volumes:
-      - ./data:/data
-    command: "/data/mydatabase.db"
+      - sqlite_data:/data
+    command: ["sqlite_web", "/data/mydatabase.db"]
+
 
 volumes:
-  mongodb_data:
-  mosquitto_data:
-  mosquitto_log:
+  sqlite_data:
+#   mosquitto_data:
+#   mosquitto_log:
