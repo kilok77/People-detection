@@ -1,5 +1,5 @@
 fastapi
 uvicorn
-pymongo
-paho-mqtt
+opencv-python
+ultralytics
 python-multipart

@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.endpoints import root, logs, iot
-from core.mqtt_client import MQTTManager
+from api.endpoints import root
+from services import ml_service  # Import the service
+from fastapi.staticfiles import StaticFiles
+
 
 app = FastAPI()
 
@@ -14,16 +16,15 @@ app.add_middleware(
 )
 
 app.include_router(root.router)
-app.include_router(logs.router, prefix="/api")
 # app.include_router(iot.router)
 
-# Create a global MQTTManager instance and start it
-mqtt_manager = MQTTManager()
-mqtt_manager.start()
+# Include the ML service endpoints
+app.include_router(ml_service.router)
 
-
+# Mount the static directory
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/")
-def read_root():
-    return {"message": "Welcome to the FastAPI application!"}
+def root():
+    return {"message": "MJPEG Streaming with FastAPI"}
