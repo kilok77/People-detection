@@ -1,132 +1,111 @@
 import cv2
 import asyncio
 import time
+import os
+import csv
 from ultralytics import YOLO
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
-
-
-router = APIRouter()
 
 # -------------------------------
 # Setup Functions
 # -------------------------------
 
 def setup_model(model_path="yolo11m.pt", imgsz=320):
-    """
-    Load the YOLO model, fuse layers, and override the input image size.
-    """
     model = YOLO(model_path)
-    model.fuse()  # Fuse layers for faster inference
-    model.overrides["imgsz"] = imgsz  # Set a smaller input size for faster processing
+    model.fuse()
+    model.overrides["imgsz"] = imgsz
     return model
 
 def setup_video_capture(video_path):
-    """
-    Initialize video capture and configure OpenCV parameters.
-    Returns the capture object and video FPS.
-    """
-    if video_path == "0":
-        cap = cv2.VideoCapture(0)
-    else:
-        cap = cv2.VideoCapture(video_path)
+    cap = cv2.VideoCapture(0 if video_path == "0" else video_path)
     if not cap.isOpened():
-        print(f"Unable to open video source: {video_path}")
-        raise ValueError(f"Video source {video_path} is not available.")
+        raise ValueError(f"Unable to open video source: {video_path}")
     cv2.setNumThreads(4)
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
-    fps = cap.get(cv2.CAP_PROP_FPS) or 30  # Default to 30 FPS if not available
+    fps = cap.get(cv2.CAP_PROP_FPS) or 30
     return cap, fps
 
-# -------------------------------
-# Processing Functions
-# -------------------------------
-
-def draw_detections(frame, results):
-    """
-    Draw bounding boxes on the frame for 'person' detections (class id 0).
-    """
-    for result in results:
-        for box, cls in zip(result.boxes.xyxy, result.boxes.cls):
-            if int(cls) == 0:
-                x1, y1, x2, y2 = map(int, box[:4])
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-    return frame
-
-def overlay_fps(frame, fps_value):
-    """
-    Overlay the FPS counter on the frame (top-left corner).
-    """
-    cv2.putText(
-        frame,
-        f"FPS: {fps_value:.1f}",
-        (10, 30),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        1,
-        (0, 255, 0),
-        2,
-    )
-    return frame
-
-async def process_frame(frame, model):
-    """
-    Run the model inference asynchronously and draw detections.
-    """
-    results = await asyncio.to_thread(model, frame)
-    frame = draw_detections(frame, results)
-    return frame
 
 # -------------------------------
 # Global Setup
 # -------------------------------
 
 model = setup_model()
-# video_path = "0"
 video_path = "video1.mp4"
+video_path = "0"
 cap, video_fps = setup_video_capture(video_path)
-frame_duration = 1 / video_fps  # Duration per frame in seconds
+router = APIRouter()
+
+print("Video FPS:", video_fps)
+
+DETECTION_DIR = "detections"
+os.makedirs(DETECTION_DIR, exist_ok=True)
+CSV_FILE = "detections.csv"
+
+if not os.path.isfile(CSV_FILE):
+    with open(CSV_FILE, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["timestamp", "image_path", "x1", "y1", "x2", "y2"])
+
+
+# -------------------------------
+# Processing Functions
+# -------------------------------
+
+def draw_detections(frame, results, timestamp):
+    detections_exist = False
+    rows_to_save = []
+    for result in results:
+        for box, cls in zip(result.boxes.xyxy, result.boxes.cls):
+            if int(cls) == 0:
+                detections_exist = True
+                x1, y1, x2, y2 = map(int, box[:4])
+                rows_to_save.append([timestamp, "", x1, y1, x2, y2])
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+    if detections_exist:
+        image_filename = f"frame_{timestamp}.jpg"
+        image_path = os.path.join(DETECTION_DIR, image_filename)
+        cv2.imwrite(image_path, frame)
+        # Update CSV rows with correct image paths
+        for row in rows_to_save:
+            row[1] = image_path
+
+        with open(CSV_FILE, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(rows_to_save)
+
+    return frame
+
+
+async def process_frame(frame, model, timestamp):
+    results = await asyncio.to_thread(model, frame)
+    frame = draw_detections(frame, results, timestamp)
+    return frame
 
 # -------------------------------
 # Frame Generator
 # -------------------------------
 
 async def generate_frames():
-    prev_time = time.time()
-    
     while True:
         success, frame = cap.read()
         if not success:
-            # If the source is a video file, restart from the beginning.
             if video_path != "0":
                 cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
                 continue
             else:
                 break
-        
-        # start_time = time.monotonic()
-       
-        # Process frame (inference + drawing detections)
-        processed_frame = await process_frame(frame, model)
-        
-        # # Calculate FPS based on time between frames
-        # current_time = time.time()
-        # calculated_fps = 1.0 / (current_time - prev_time) if (current_time - prev_time) > 0 else 0
-        # prev_time = current_time
-        
-        # # Overlay FPS counter on the frame
-        # processed_frame = overlay_fps(processed_frame, calculated_fps)
-        
-        # Encode frame as JPEG
+
+        timestamp = int(time.time())
+        processed_frame = await process_frame(frame, model, timestamp)
+
         success_enc, buffer = cv2.imencode('.jpg', processed_frame)
         if not success_enc:
             continue
         frame_bytes = buffer.tobytes()
-        
-        # elapsed = time.monotonic() - start_time
-        # delay = frame_duration - elapsed
-        # if delay > 0:
-        #     await asyncio.sleep(delay)
-        
+
         yield (
             b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n'
