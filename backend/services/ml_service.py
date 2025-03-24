@@ -5,13 +5,14 @@ from ultralytics import YOLO
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
+
 router = APIRouter()
 
 # -------------------------------
 # Setup Functions
 # -------------------------------
 
-def setup_model(model_path="yolov8n.pt", imgsz=320):
+def setup_model(model_path="yolov8s.pt", imgsz=320):
     """
     Load the YOLO model, fuse layers, and override the input image size.
     """
@@ -25,7 +26,13 @@ def setup_video_capture(video_path):
     Initialize video capture and configure OpenCV parameters.
     Returns the capture object and video FPS.
     """
-    cap = cv2.VideoCapture(video_path)
+    if video_path == "0":
+        cap = cv2.VideoCapture(0)
+    else:
+        cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print(f"Unable to open video source: {video_path}")
+        raise ValueError(f"Video source {video_path} is not available.")
     cv2.setNumThreads(4)
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
     fps = cap.get(cv2.CAP_PROP_FPS) or 30  # Default to 30 FPS if not available
@@ -74,7 +81,9 @@ async def process_frame(frame, model):
 # -------------------------------
 
 model = setup_model()
-video_path = "./face_recogniction_video.mov"
+# video_path = "./face_recogniction_video.mov"
+# video_path = "0"
+video_path = "video1.mp4"
 cap, video_fps = setup_video_capture(video_path)
 frame_duration = 1 / video_fps  # Duration per frame in seconds
 
@@ -88,7 +97,12 @@ async def generate_frames():
     while True:
         success, frame = cap.read()
         if not success:
-            break
+            # If the source is a video file, restart from the beginning.
+            if video_path != "0":
+                cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                continue
+            else:
+                break
         
         start_time = time.monotonic()
        
