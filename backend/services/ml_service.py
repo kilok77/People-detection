@@ -12,7 +12,7 @@ router = APIRouter()
 # Setup Functions
 # -------------------------------
 
-def setup_model(model_path="yolov8s.pt", imgsz=320):
+def setup_model(model_path="yolo11m.pt", imgsz=320):
     """
     Load the YOLO model, fuse layers, and override the input image size.
     """
@@ -81,7 +81,6 @@ async def process_frame(frame, model):
 # -------------------------------
 
 model = setup_model()
-# video_path = "./face_recogniction_video.mov"
 # video_path = "0"
 video_path = "video1.mp4"
 cap, video_fps = setup_video_capture(video_path)
@@ -104,18 +103,18 @@ async def generate_frames():
             else:
                 break
         
-        start_time = time.monotonic()
+        # start_time = time.monotonic()
        
         # Process frame (inference + drawing detections)
         processed_frame = await process_frame(frame, model)
         
-        # Calculate FPS based on time between frames
-        current_time = time.time()
-        calculated_fps = 1.0 / (current_time - prev_time) if (current_time - prev_time) > 0 else 0
-        prev_time = current_time
+        # # Calculate FPS based on time between frames
+        # current_time = time.time()
+        # calculated_fps = 1.0 / (current_time - prev_time) if (current_time - prev_time) > 0 else 0
+        # prev_time = current_time
         
-        # Overlay FPS counter on the frame
-        processed_frame = overlay_fps(processed_frame, calculated_fps)
+        # # Overlay FPS counter on the frame
+        # processed_frame = overlay_fps(processed_frame, calculated_fps)
         
         # Encode frame as JPEG
         success_enc, buffer = cv2.imencode('.jpg', processed_frame)
@@ -123,10 +122,10 @@ async def generate_frames():
             continue
         frame_bytes = buffer.tobytes()
         
-        elapsed = time.monotonic() - start_time
-        delay = frame_duration - elapsed
-        if delay > 0:
-            await asyncio.sleep(delay)
+        # elapsed = time.monotonic() - start_time
+        # delay = frame_duration - elapsed
+        # if delay > 0:
+        #     await asyncio.sleep(delay)
         
         yield (
             b'--frame\r\n'
