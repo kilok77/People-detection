@@ -1,13 +1,18 @@
-# SEP4
+# People Detection
+
+This project uses computer vision techniques to locate and track people in video streams. The FastAPI backend handles detection with OpenCV and YOLOv11, while a simple React frontend displays the results. The application is containerized with Docker for easy setup and deployment.
 
 ## Installation
 
 ### Prerequisites
 
+- Python
+- Node.js
 - Docker
-- Docker Compose
 
-### Steps
+## Running the Project
+
+### With Docker
 
 1. **Clone the repository:**
 
@@ -25,7 +30,6 @@
 3. **Access the application:**
    - Backend: `http://localhost:8000`
    - Frontend: `http://localhost:3000`
-   - Database: `http://localhost:5432`
 
 ### Additional Commands
 
@@ -42,13 +46,74 @@
   ```
 
 - **Rebuild containers:**
+
   ```sh
   docker-compose up --build
   ```
 
+### Without Docker
+
+1. **Clone the repository:**
+
+   ```sh
+   git clone https://github.com/yourusername/your-repo.git
+   cd your-repo
+   ```
+
+2. **Backend Setup:**
+
+   - Navigate to the backend directory:
+
+     ```sh
+     cd backend
+     ```
+
+   - Create a virtual environment:
+
+     ```sh
+     python -m venv venv
+     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+     ```
+
+   - Install dependencies:
+
+     ```sh
+     pip install -r requirements.txt
+     ```
+
+   - Run the backend server:
+
+     ```sh
+     python main.py
+     ```
+
+3. **Frontend Setup:**
+
+   - Navigate to the frontend directory:
+
+     ```sh
+     cd ../frontend
+     ```
+
+   - Install dependencies:
+
+     ```sh
+     npm install
+     ```
+
+   - Run the frontend server:
+
+     ```sh
+     npm start
+     ```
+
+4. **Access the application:**
+   - Backend: `http://localhost:8000`
+   - Frontend: `http://localhost:3000`
+
 ### Notes
 
-- Ensure Docker is running before executing the commands.
+- Ensure Docker is running before executing the Docker commands.
 - Update the `.env` file with necessary environment variables if required.
 - For database migrations, run:
   ```sh

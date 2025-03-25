@@ -6,11 +6,9 @@ services:
     container_name: backend
     ports:
       - "8000:8000"
-    depends_on:
-      - sqlite-web
-    environment:
-      MONGO_URL: "mongodb://admin:password@mongodb:27017/"
-
+    volumes:
+      - ./backend/videos:/app/videos
+      - ./backend/csv:/app/csv
   frontend:
     build: ./frontend
     container_name: frontend
@@ -18,18 +16,3 @@ services:
       - "3000:80"
     depends_on:
       - backend
-
-  sqlite-web:
-    image: coleifer/sqlite-web:latest
-    container_name: sqlite-web
-    ports:
-      - "8080:8080"
-    volumes:
-      - sqlite_data:/data
-    command: ["sqlite_web", "/data/mydatabase.db"]
-
-
-volumes:
-  sqlite_data:
-#   mosquitto_data:
-#   mosquitto_log:
