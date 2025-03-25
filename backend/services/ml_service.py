@@ -36,8 +36,9 @@ video_path = "0"
 cap, video_fps = setup_video_capture(video_path)
 router = APIRouter()
 
-CSV_FILE = "./csv/detections.csv"
-
+CSV_DIR = "./csv"
+CSV_FILE = os.path.join(CSV_DIR, "detections.csv")
+os.makedirs(CSV_DIR, exist_ok=True)
 if not os.path.isfile(CSV_FILE):
     with open(CSV_FILE, mode='w', newline='') as file:
         writer = csv.writer(file)
