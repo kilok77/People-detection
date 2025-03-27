@@ -1,20 +1,26 @@
+// src/App.tsx
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LogsPage from "./pages/LogsPage";
-import Navbar from "./components/Navbar";
-import { Container } from "@mui/material";
+import VideoListPage from "./pages/VideoListPage";
+import VideoPlayerPage from "./pages/VideoPlayerPage";
+import CameraPage from "./pages/CameraPage"; // <-- Import the new page
 
-const App: React.FC = () => {
+function App() {
   return (
     <Router>
-      <Navbar />
-      <Container>
-        <Routes>
-          <Route path="/" element={<LogsPage />} />
-        </Routes>
-      </Container>
+      <Routes>
+        {/* Home page with the video list */}
+        <Route path="/" element={<VideoListPage />} />
+
+        {/* Video player page for a specific video */}
+        <Route path="/videos/:videoName" element={<VideoPlayerPage />} />
+
+        {/* Live camera feed page */}
+        <Route path="/camera" element={<CameraPage />} />
+      </Routes>
     </Router>
   );
-};
+}
 
 export default App;

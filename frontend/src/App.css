@@ -36,3 +36,14 @@
     transform: rotate(360deg);
   }
 }
+
+.camera-feed {
+  display: block;
+  width: 640px; /* Set desired width */
+  height: 480px; /* Set desired height */
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #000;
+}
