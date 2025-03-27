@@ -4,7 +4,7 @@ import time
 import os
 import csv
 from ultralytics import YOLO
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 
 # -------------------------------
@@ -80,9 +80,9 @@ async def process_frame(frame, model, timestamp, frame_number, video_id):
 # Frame Generator
 # -------------------------------
 
-async def generate_frames():
+async def generate_frames(request : Request):
     global current_video_id
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    fourcc = cv2.VideoWriter_fourcc(*'H264')
     frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
@@ -127,8 +127,8 @@ async def generate_frames():
 # -------------------------------
 
 @router.get("/video_feed")
-async def video_feed():
+async def video_feed(request: Request):
     return StreamingResponse(
-        generate_frames(),
+        generate_frames(request),
         media_type="multipart/x-mixed-replace; boundary=frame"
     )
