@@ -19,6 +19,7 @@ Currently, Docker is running, but it’s not as fast as I’d like, and I’m ha
 - Python
 - Node.js
 - Docker
+- Ffmpeg (For backend to generate thumbnails)
 
 ## Running the Project
 
@@ -114,7 +115,7 @@ Currently, Docker is running, but it’s not as fast as I’d like, and I’m ha
    - Run the frontend server:
 
      ```sh
-     nginx -g "daemon off;"
+     npm start
      ```
 
 4. **Access the application:**
