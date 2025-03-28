@@ -19,7 +19,33 @@ Currently, Docker is running, but it’s not as fast as I’d like, and I’m ha
 - Python
 - Node.js
 - Docker
-- Ffmpeg (For backend to generate thumbnails)
+
+### System-Level Dependencies
+
+To ensure the project runs smoothly, the following system-level dependencies must be installed:
+
+1. **FFmpeg**: Required for generating video thumbnails in the backend.
+
+   - **macOS**: Install using Homebrew:
+     ```sh
+     brew install ffmpeg
+     ```
+   - **Ubuntu**: Install using APT:
+     ```sh
+     sudo apt update && sudo apt install ffmpeg
+     ```
+   - **Windows**: Download and install from [ffmpeg.org](https://ffmpeg.org/).
+
+2. **OpenCV System Libraries**: Required for video processing and camera feed handling.
+   - **macOS**: Install using Homebrew:
+     ```sh
+     brew install opencv
+     ```
+   - **Ubuntu**: Install using APT:
+     ```sh
+     sudo apt update && sudo apt install libopencv-dev
+     ```
+   - **Windows**: OpenCV is typically bundled with the Python package `opencv-python`, but additional setup may be required for advanced features.
 
 ## Running the Project
 
