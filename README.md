@@ -4,7 +4,7 @@ This project uses computer vision techniques to locate and track people in video
 
 ## Current State
 
-Currently, Docker is running, but it’s not as fast as I’d like, and I’m having trouble optimizing it for machine learning tasks. The people detection algorithm is functioning, yet it sometimes creates two bounding boxes around a single person when there’s a lot of movement. Additionally, in the provided video, the second person is not always detected, resulting in gaps, which could be addressed using SORT algorithms. The backend produces an MJPEG stream accessible through the React page, but when switching routes from the live view to the video list view, the HTTP connection does not stop. I’ve tried for a while to fix and stop it, but I’m currently unsure how to proceed.
+Currently, Docker is running, but it’s not as fast as I’d like, and I’m having trouble optimizing it for machine learning tasks. The people detection algorithm is functioning, yet it sometimes creates two bounding boxes around a single person when there’s a lot of movement. Also frames are saved to a video but the framerate is not in sync. Additionally, in the provided video, the second person is not always detected, resulting in gaps, which could be addressed using SORT algorithms. The backend produces an MJPEG stream accessible through the React page, but when switching routes from the live view to the video list view, the HTTP connection does not stop. I’ve tried for a while to fix and stop it, but I’m currently unsure how to proceed.
 
 - **Configurable Source**: Easily switch between live camera feeds or file-based inputs via environment variables.
 - **CSV Metadata**: All detection data is recorded in CSV files for easy analysis.
