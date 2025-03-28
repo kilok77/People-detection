@@ -8,6 +8,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/videos:/app/videos
+      - ./backend/thumbnails:/app/thumbnails
       - ./backend/csv:/app/csv
   frontend:
     build: ./frontend

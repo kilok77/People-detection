@@ -64,8 +64,6 @@ async def list_videos():
 
 CHUNK_SIZE = 1024 * 1024  # 1 MB chunk size
 
-CHUNK_SIZE = 1024 * 1024  # 1 MB chunks
-
 @router.get("/video/{video_name}")
 async def stream_video(video_name: str, request: Request):
     video_path = os.path.join("videos", video_name)

@@ -6,6 +6,9 @@ import csv
 from ultralytics import YOLO
 from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
+from core.config import Config
+
+
 
 # -------------------------------
 # Setup Functions
@@ -32,7 +35,8 @@ def setup_video_capture(video_path):
 
 model = setup_model()
 # video_path = "video1.mp4"
-video_path = "0"
+print("Config:", Config.CV_MODE)
+video_path = Config.CV_MODE
 cap, video_fps = setup_video_capture(video_path)
 router = APIRouter()
 

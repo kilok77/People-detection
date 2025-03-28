@@ -1,6 +1,4 @@
-import { logDOM } from "@testing-library/dom";
-import { log } from "console";
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 const SimpleMjpeg: React.FC = () => {
